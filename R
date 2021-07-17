@@ -1,0 +1,68 @@
+# R code 
+Clincal_samples772uniq = read.delim(”clinical_samples772uniq”, header=FALSE)
+Cancer_analysis772_yob = read.delim(“cancer_analysis772_yob”, header=FALSE)
+V8list=merge(cancer_analysis772_yob, clinical_samples772uniq, by=”V1”)
+V8list$Onset = ifelse(v8losts$Onset <= 50, “E”, ifelse(v8lists$Onset >= 70, “L”, “M”))
+Write.table(v8lists, file=’v8patients.tsv’, quote=FALSE, sep=’\t’)
+
+# Prepring for LiftOver
+Lifted = read.table(‘hg38_liftedCOHORT10.bed’, header = F, sep=’\t’)
+PRS=read.table(‘PRS_base_Law’, header=T, sep=’\t’)
+Column_names=c(‘CHR’, ‘CH38’, ‘CH38plus1’, ‘SNP’)
+Names(lifted) = column_names
+Total = merge(PRS, lifted, by=’SNP’,all=T)
+Write.table(total, file=’PRSplusLifted’, quote=FALSE, sep=’\t’)
+Drop=c(“Cytoband”,”Position..bp..GRCh37.”,”X95..CI”,Pvalue_E”,”P.value”,CHR.y”,”CH38plus1”)
+Df = total[,!(names(total) %in% drop)]
+colnames(df)
+col_order=c(“SNP”,”CHR.x”,”CH38”,”Risk.alt.allele”,”OR”,”Pvalue30”)
+df2=df[,col_order]
+write.table(df2, file=’df2’,quote=FALSE, sep=’\t’)
+LiftedLaw = read.table(‘PRS_Lifted_Law’, header=T, sep=’\t’)
+EOLO = read.table(‘PlatekeyIDlistv6v8’, header=T, sep=’\t’)
+
+# muational signatures
+V6Signatures=read.table(‘cv6signatres.csv’, header=T, sep=’\t’)
+PlatekeyID = read.table(‘PlatekeyIDv6’, header+T, sep=’\t’)
+newnames = c(“Germline.Sample.Platekey”, “Onset”, “Version”)
+names(V6cancer)
+ggplot(V6final, as(x=Signature.1, group=Onset, fill=Onset))+
+	geom_density(alpha=.3)+
+	theme_classic()+
+	scale_fill_manual(values=c(“deepskyblue”,”darkorchid”))+
+	facet_wrap(~Onset)
+
+ggplot(V6final, as(x=Somatic.Coding.Variants.Per.Mb, group=Onset, fill=Onset))+
+	geom_density(alpha=.3)+
+	theme_classic()+
+	scale_fill_manual(values=c(“deepskyblue”,”darkorchid”))+
+	facet_wrap(~Onset)
+
+MSI = read.table(‘MSI_V8_info.csv’, header=T, sep = ‘\t’)
+IDall = read.table(‘PlatekeyIDlistv6v8’, header = T, sep = ‘\t’)
+newname = c(‘germline_sample_platekey’, ‘Onset’, ‘Version’)
+names(IDall)=newname
+MSIall2=MSIall[!is.na(MSIall$msing_score),]
+MSIall3=MSIall2[!is.na(MSIall2$location),]
+boxplot(MSIall2$msing_score~MSIall2$Onset, col = blues9,
+	Xlab=”Onset”,
+	Ylab=”msing score”)
+
+# PRSice2 results
+df1=read.table(‘Testing.all.score’, header=T, sep=””)
+df2=read.table(‘LawSNPsExcluded.fam’, header=F, sep=””)
+n1=c(“FID”, “IID”, “Score”)
+names(df1)=n1
+colstodrop=c(“V3”,”V4,”V5”)
+df2.2=df2[,!(names(df2) %in% colstodrop)]
+newnames = c(“FID”,”IID”,”Onset”)
+names(df2.2)=newnames
+df3 = merge(df1, df2.2, by=”FID”)
+colstodrop=c(“IID.y”)
+df4=df3[,!(names(df3) %in% colstodrop)]
+df4$Onset = gsub(“1”, “Late”, df4$Onset)
+df4$Onset = gsub(“2”, “Early”, df$Onset)
+ggplot(df4, aes(x=Score, group=Onset, fill=Onset))+
+	geom_density(adjust=1.5, alpha=.3)+
+	theme_classic()+
+	scale_fill_manual(values=c(“deepskyblue”, “darkorchid3”))
